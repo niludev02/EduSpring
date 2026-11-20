@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Disciplinas')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container mt-4">
+    <div class="box shadow-sm">
+        <h1 class="mb-4">Disciplinas</h1>
+
+        <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+
+        <form th:action="@{/web/disciplinas}" th:object="${form}" method="post" class="form-inline mb-4">
+            <input class="form-control mr-2" type="text" th:field="*{nome}" placeholder="Nome da disciplina">
+            <button class="btn btn-primary" type="submit">Cadastrar disciplina</button>
+            <small class="text-danger ml-3" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+        </form>
+
+        <div class="alert alert-info" th:if="${#lists.isEmpty(disciplinas)}">Nenhuma disciplina cadastrada.</div>
+
+        <table class="table table-striped" th:unless="${#lists.isEmpty(disciplinas)}">
+            <thead class="thead-dark">
+            <tr><th>#</th><th>Nome</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="d : ${disciplinas}">
+                <td th:text="${d.id()}">1</td>
+                <td th:text="${d.nome()}">Nome</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

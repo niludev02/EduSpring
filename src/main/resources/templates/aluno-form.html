@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Aluno')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container mt-4" style="max-width: 600px;">
+    <div class="box shadow-sm">
+        <h1 class="mb-4" th:text="${titulo}">Novo aluno</h1>
+
+        <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+
+        <form th:action="@{${acao}}" th:object="${form}" method="post">
+            <div class="form-group">
+                <label>Matrícula</label>
+                <input class="form-control" type="text" th:field="*{matricula}">
+                <small class="text-danger" th:if="${#fields.hasErrors('matricula')}" th:errors="*{matricula}"></small>
+            </div>
+            <div class="form-group">
+                <label>Nome</label>
+                <input class="form-control" type="text" th:field="*{nome}">
+                <small class="text-danger" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+            </div>
+            <div class="form-group">
+                <label>Idade</label>
+                <input class="form-control" type="number" th:field="*{idade}">
+                <small class="text-danger" th:if="${#fields.hasErrors('idade')}" th:errors="*{idade}"></small>
+            </div>
+            <div class="form-group">
+                <label>Turma</label>
+                <select class="form-control" th:field="*{turmaId}">
+                    <option value="">Sem turma</option>
+                    <option th:each="t : ${turmas}" th:value="${t.id()}" th:text="${t.identificador()}"></option>
+                </select>
+            </div>
+            <button class="btn btn-primary" type="submit">Salvar</button>
+            <a class="btn btn-secondary" th:href="@{/web/alunos}">Cancelar</a>
+        </form>
+    </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Alunos')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container mt-4">
+    <div class="box shadow-sm">
+        <h1 class="mb-4">Alunos</h1>
+
+        <form th:action="@{/web/alunos}" method="get" class="form-inline mb-3">
+            <input class="form-control mr-2 mb-2" type="text" name="nome" th:value="${nome}" placeholder="Buscar por nome">
+            <select class="form-control mr-2 mb-2" name="turma">
+                <option value="">Todas as turmas</option>
+                <option th:each="t : ${turmas}" th:value="${t.identificador()}" th:text="${t.identificador()}"
+                        th:selected="${t.identificador() == turma}"></option>
+            </select>
+            <select class="form-control mr-2 mb-2" name="ordem">
+                <option value="">Sem ordenação</option>
+                <option value="idade" th:selected="${ordem == 'idade'}">Ordenar por idade</option>
+                <option value="media" th:selected="${ordem == 'media'}">Ordenar por média</option>
+            </select>
+            <button class="btn btn-outline-primary mr-2 mb-2" type="submit">Filtrar</button>
+            <a class="btn btn-outline-secondary mb-2" th:href="@{/web/alunos}">Limpar</a>
+        </form>
+        <p class="text-muted small">Busca por nome ou turma (um filtro por vez). A ordenação vale quando não há filtro.</p>
+
+        <div class="alert alert-info" th:if="${#lists.isEmpty(alunos)}">Nenhum aluno encontrado.</div>
+
+        <table class="table table-striped" th:unless="${#lists.isEmpty(alunos)}">
+            <thead class="thead-dark">
+            <tr><th>Matrícula</th><th>Nome</th><th>Idade</th><th>Turma</th><th>Média</th><th>Ações</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${alunos}">
+                <td th:text="${a.matricula()}">0</td>
+                <td th:text="${a.nome()}">Nome</td>
+                <td th:text="${a.idade()}">0</td>
+                <td th:text="${a.turma() != null} ? ${a.turma()} : '-'">-</td>
+                <td th:text="${#numbers.formatDecimal(a.media(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                <td class="form-inline">
+                    <a class="btn btn-sm btn-outline-primary mr-1" th:href="@{/web/alunos/{id}/boletim(id=${a.id()})}">Boletim</a>
+                    <a class="btn btn-sm btn-outline-secondary mr-1" th:href="@{/web/alunos/{id}/editar(id=${a.id()})}">Editar</a>
+                    <form th:action="@{/web/alunos/{id}/remover(id=${a.id()})}" method="post"
+                          onsubmit="return confirm('Remover este aluno?')">
+                        <button class="btn btn-sm btn-danger" type="submit">Remover</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+        <p class="text-muted" th:unless="${#lists.isEmpty(alunos)}"
+           th:text="'Total: ' + ${alunos.size()} + ' aluno(s)'"></p>
+
+        <a class="btn btn-primary" th:href="@{/web/alunos/novo}">+ Novo aluno</a>
+    </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

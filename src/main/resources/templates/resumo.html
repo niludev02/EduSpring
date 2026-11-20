@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Resumo')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container mt-4">
+    <div class="alert alert-danger d-none" id="erro"></div>
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="box shadow-sm">
+                <h4>Turmas</h4>
+                <table class="table table-sm">
+                    <thead><tr><th>Turma</th><th>Alunos (query nativa)</th><th>Média</th></tr></thead>
+                    <tbody id="turmas"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="box shadow-sm">
+                <h4>Ranking de alunos por média</h4>
+                <table class="table table-sm">
+                    <thead><tr><th>#</th><th>Aluno</th><th>Turma</th><th>Média</th></tr></thead>
+                    <tbody id="ranking"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function fmt(n) { return Number(n).toFixed(2).replace('.', ','); }
+
+    function linha(valores) {
+        const tr = document.createElement('tr');
+        valores.forEach(function (v) {
+            const td = document.createElement('td');
+            td.textContent = v;
+            tr.appendChild(td);
+        });
+        return tr;
+    }
+
+    async function api(url) {
+        const resp = await fetch(url);
+        if (!resp.ok) {
+            const erro = await resp.json().catch(function () { return {}; });
+            throw new Error(erro.mensagem || 'Erro ' + resp.status);
+        }
+        return resp.json();
+    }
+
+    async function carregar() {
+        try {
+            const turmas = await api('/turmas');
+            const corpoTurmas = document.getElementById('turmas');
+            for (const t of turmas) {
+                const qtd = await api('/turmas/' + encodeURIComponent(t.identificador) + '/quantidade-alunos');
+                corpoTurmas.appendChild(linha([t.identificador, qtd, fmt(t.media)]));
+            }
+
+            const ranking = await api('/alunos?ordem=media');
+            const corpoRanking = document.getElementById('ranking');
+            ranking.forEach(function (a, i) {
+                corpoRanking.appendChild(linha([i + 1, a.nome, a.turma || '-', fmt(a.media)]));
+            });
+        } catch (e) {
+            const box = document.getElementById('erro');
+            box.textContent = e.message;
+            box.classList.remove('d-none');
+        }
+    }
+
+    carregar();
+</script>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Início')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container mt-4">
+    <div class="hero text-center mb-4">
+        <img th:src="@{/img/logo.svg}" alt="Logo EduSpring">
+        <h1>Edu<span class="spring">Spring</span></h1>
+        <p class="tagline mb-1">Escola de Spring</p>
+        <p class="mb-0">Onde o conhecimento brota.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-6 col-md-3 mb-3">
+            <a class="atalho" th:href="@{/web/turmas}">
+                <div class="emoji">🏫</div><h5>Turmas</h5><small>Salas, alunos e médias</small>
+            </a>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <a class="atalho" th:href="@{/web/alunos}">
+                <div class="emoji">🎒</div><h5>Alunos</h5><small>Cadastro, busca e boletim</small>
+            </a>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <a class="atalho" th:href="@{/web/disciplinas}">
+                <div class="emoji">📚</div><h5>Disciplinas</h5><small>Grade de matérias</small>
+            </a>
+        </div>
+        <div class="col-6 col-md-3 mb-3">
+            <a class="atalho" th:href="@{/web/resumo}">
+                <div class="emoji">🌳</div><h5>Resumo</h5><small>Ranking e números da escola</small>
+            </a>
+        </div>
+    </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

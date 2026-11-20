@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Turmas')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container mt-4">
+    <div class="box shadow-sm">
+        <h1 class="mb-4">Turmas</h1>
+
+        <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+
+        <form th:action="@{/web/turmas}" th:object="${form}" method="post" class="form-inline mb-4">
+            <input class="form-control mr-2" type="text" th:field="*{identificador}" placeholder="Identificador (ex: DSM-3)">
+            <button class="btn btn-primary" type="submit">Cadastrar turma</button>
+            <small class="text-danger ml-3" th:if="${#fields.hasErrors('identificador')}" th:errors="*{identificador}"></small>
+        </form>
+
+        <div class="alert alert-info" th:if="${#lists.isEmpty(turmas)}">Nenhuma turma cadastrada.</div>
+
+        <table class="table table-striped" th:unless="${#lists.isEmpty(turmas)}">
+            <thead class="thead-dark">
+            <tr><th>Turma</th><th>Alunos</th><th>Média da turma</th><th>Ações</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${turmas}">
+                <td th:text="${t.identificador()}">DSM-1</td>
+                <td th:text="${t.quantidadeAlunos()}">0</td>
+                <td th:text="${#numbers.formatDecimal(t.media(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
+                <td><a class="btn btn-sm btn-outline-primary" th:href="@{/web/alunos(turma=${t.identificador()})}">Ver alunos</a></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>

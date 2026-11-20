@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-BR">
+<head th:replace="~{fragments :: head('Boletim')}"></head>
+<body>
+<nav th:replace="~{fragments :: navbar}"></nav>
+<div class="container mt-4" style="max-width: 800px;">
+    <div class="box shadow-sm">
+        <h1 class="mb-1" th:text="'Boletim de ' + ${boletim.nome()}">Boletim</h1>
+        <p class="lead" th:text="'Média: ' + ${#numbers.formatDecimal(boletim.media(), 1, 'POINT', 2, 'COMMA')}">Média: 0,00</p>
+
+        <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
+
+        <div class="alert alert-info" th:if="${#lists.isEmpty(boletim.notas())}">Nenhuma nota lançada.</div>
+
+        <table class="table table-striped" th:unless="${#lists.isEmpty(boletim.notas())}">
+            <thead class="thead-dark">
+            <tr><th>Disciplina</th><th>Nota</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="n : ${boletim.notas()}">
+                <td th:text="${n.disciplina()}">Disciplina</td>
+                <td th:text="${n.valor() != null} ? ${#numbers.formatDecimal(n.valor(), 1, 'POINT', 2, 'COMMA')} : '-'">-</td>
+            </tr>
+            </tbody>
+        </table>
+
+        <h5 class="mt-4">Lançar ou alterar nota</h5>
+        <form th:action="@{/web/alunos/{id}/notas(id=${boletim.alunoId()})}" th:object="${form}" method="post" class="form-inline">
+            <select class="form-control mr-2 mb-2" th:field="*{disciplinaId}">
+                <option value="">Disciplina...</option>
+                <option th:each="d : ${disciplinas}" th:value="${d.id()}" th:text="${d.nome()}"></option>
+            </select>
+            <input class="form-control mr-2 mb-2" type="number" step="0.01" min="0" max="10" th:field="*{valor}" placeholder="Nota (0 a 10)">
+            <button class="btn btn-primary mb-2" type="submit">Salvar nota</button>
+        </form>
+        <small class="text-danger d-block" th:if="${#fields.hasErrors('disciplinaId')}" th:errors="*{disciplinaId}"></small>
+        <small class="text-danger d-block" th:if="${#fields.hasErrors('valor')}" th:errors="*{valor}"></small>
+
+        <a class="btn btn-secondary mt-3" th:href="@{/web/alunos}">Voltar</a>
+    </div>
+</div>
+<footer th:replace="~{fragments :: footer}"></footer>
+</body>
+</html>
