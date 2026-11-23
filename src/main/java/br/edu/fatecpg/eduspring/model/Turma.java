@@ -1,6 +1,7 @@
 package br.edu.fatecpg.eduspring.model;
 
 import br.edu.fatecpg.eduspring.exception.NegocioException;
+import br.edu.fatecpg.eduspring.util.TextoUtils;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -24,8 +25,10 @@ public class Turma {
     private List<Aluno> alunos = new ArrayList<>();
 
     public void adicionarAluno(Aluno a) {
-        if (buscarAluno(a.getMatricula()).isPresent())
-            throw NegocioException.conflito("Aluno já está na turma");
+        if (buscarAluno(a.getMatricula()).isPresent()
+                || alunos.stream().anyMatch(aluno ->
+                        TextoUtils.equivalentes(aluno.getMatricula(), a.getMatricula())))
+            throw NegocioException.conflito("Este aluno já está vinculado à turma.");
         alunos.add(a);
         a.setTurma(this);
     }

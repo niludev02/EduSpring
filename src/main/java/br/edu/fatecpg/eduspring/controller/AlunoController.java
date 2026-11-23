@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/alunos")
 @RequiredArgsConstructor
-public class AlunoController {
+public class  AlunoController {
     private final AlunoService service;
 
     @GetMapping
@@ -52,5 +52,11 @@ public class AlunoController {
     public BoletimItem lancarNota(@PathVariable Long id, @PathVariable Long disciplinaId,
                                   @Valid @RequestBody NotaRequest r) {
         return service.lancarNota(id, disciplinaId, r.valor());
+    }
+
+    @DeleteMapping("/{id}/notas/{disciplinaId}")
+    public ResponseEntity<Void> removerNota(@PathVariable Long id, @PathVariable Long disciplinaId) {
+        service.removerNota(id, disciplinaId);
+        return ResponseEntity.noContent().build();
     }
 }

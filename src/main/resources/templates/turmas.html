@@ -9,27 +9,55 @@
 
         <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
 
-        <form th:action="@{/web/turmas}" th:object="${form}" method="post" class="form-inline mb-4">
-            <input class="form-control mr-2" type="text" th:field="*{identificador}" placeholder="Identificador (ex: DSM-3)">
-            <button class="btn btn-primary" type="submit">Cadastrar turma</button>
+        <form th:action="${editarId != null} ? @{/web/turmas/{id}/editar(id=${editarId})} : @{/web/turmas}"
+              th:object="${form}" method="post" class="form-cadastro form-inline mb-4">
+            <label class="sr-only" for="identificadorTurma">Identificador da turma</label>
+            <input id="identificadorTurma" class="form-control mr-2 mb-2" type="text" th:field="*{identificador}" placeholder="Identificador (ex: DSM-3)">
+            <label class="sr-only" for="professorTurma">Professor responsável</label>
+            <select id="professorTurma" class="form-control mr-2 mb-2" th:field="*{professorId}">
+                <option value="">Sem professor responsável</option>
+                <option th:each="p : ${professoresDisponiveis}"
+                        th:value="${p.id}" th:text="${p.nome}"></option>
+            </select>
+            <button class="btn btn-primary mb-2" type="submit"
+                    th:text="${editarId != null} ? 'Salvar alterações' : 'Cadastrar turma'">Cadastrar turma</button>
+            <a th:if="${editarId != null}" class="btn btn-outline-secondary ml-2" th:href="@{/web/turmas}">Cancelar</a>
             <small class="text-danger ml-3" th:if="${#fields.hasErrors('identificador')}" th:errors="*{identificador}"></small>
         </form>
 
         <div class="alert alert-info" th:if="${#lists.isEmpty(turmas)}">Nenhuma turma cadastrada.</div>
 
-        <table class="table table-striped" th:unless="${#lists.isEmpty(turmas)}">
+        <div class="table-responsive" th:unless="${#lists.isEmpty(turmas)}">
+        <table class="table table-striped mb-0">
             <thead class="thead-dark">
-            <tr><th>Turma</th><th>Alunos</th><th>Média da turma</th><th>Ações</th></tr>
+            <tr><th>Turma</th><th>Professor responsável</th><th>Alunos</th><th>Média da turma</th><th>Ações</th></tr>
             </thead>
             <tbody>
             <tr th:each="t : ${turmas}">
                 <td th:text="${t.identificador()}">DSM-1</td>
+                <td>
+                    <span th:if="${t.professor() != null}" th:text="${t.professor()}">Professor</span>
+                    <span th:unless="${t.professor() != null}" class="text-muted">Não atribuído</span>
+                </td>
                 <td th:text="${t.quantidadeAlunos()}">0</td>
                 <td th:text="${#numbers.formatDecimal(t.media(), 1, 'POINT', 2, 'COMMA')}">0,00</td>
-                <td><a class="btn btn-sm btn-outline-primary" th:href="@{/web/alunos(turma=${t.identificador()})}">Ver alunos</a></td>
+                <td>
+                    <a class="btn btn-sm btn-outline-primary mr-1" th:href="@{/web/alunos(turma=${t.identificador()})}">Ver alunos</a>
+                    <a class="btn btn-sm btn-outline-secondary mr-1"
+                       th:href="@{/web/turmas(editar=${t.id()})}">Editar</a>
+                    <form th:if="${t.quantidadeAlunos() == 0 and !t.possuiProfessor()}"
+                          th:action="@{/web/turmas/{id}/remover(id=${t.id()})}" method="post" class="d-inline"
+                          onsubmit="return confirm('Excluir esta turma?');">
+                        <button class="btn btn-sm btn-danger" type="submit">Excluir</button>
+                    </form>
+                    <button th:if="${t.quantidadeAlunos() > 0 or t.possuiProfessor()}"
+                            class="btn btn-sm btn-secondary" type="button" disabled
+                            th:title="${t.possuiProfessor()} ? 'Exclusão bloqueada: a turma possui professor responsável' : 'Exclusão bloqueada: a turma possui alunos'">Excluir</button>
+                </td>
             </tr>
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 <footer th:replace="~{fragments :: footer}"></footer>

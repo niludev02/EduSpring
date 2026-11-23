@@ -35,7 +35,7 @@ public class Aluno {
 
     public Nota adicionarDisciplina(Disciplina d) {
         if (notas.stream().anyMatch(n -> n.getDisciplina().getId().equals(d.getId())))
-            throw NegocioException.conflito("Aluno já possui a disciplina " + d.getNome());
+            throw NegocioException.conflito("O aluno já possui uma nota nesta disciplina.");
         Nota n = new Nota(this, d);
         notas.add(n);
         return n;
@@ -43,7 +43,7 @@ public class Aluno {
 
     public void removerDisciplina(Disciplina d) {
         boolean removeu = notas.removeIf(n -> n.getDisciplina().getId().equals(d.getId()));
-        if (!removeu) throw NegocioException.naoEncontrado("Aluno não possui a disciplina " + d.getNome());
+        if (!removeu) throw NegocioException.naoEncontrado("Não existe nota lançada para esta disciplina.");
     }
 
     public boolean temNotas() {

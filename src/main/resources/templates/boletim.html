@@ -3,38 +3,80 @@
 <head th:replace="~{fragments :: head('Boletim')}"></head>
 <body>
 <nav th:replace="~{fragments :: navbar}"></nav>
-<div class="container mt-4" style="max-width: 800px;">
+<div class="container mt-4" style="max-width: 900px;">
     <div class="box shadow-sm">
-        <h1 class="mb-1" th:text="'Boletim de ' + ${boletim.nome()}">Boletim</h1>
-        <p class="lead" th:text="'Média: ' + ${#numbers.formatDecimal(boletim.media(), 1, 'POINT', 2, 'COMMA')}">Média: 0,00</p>
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h1 class="mb-1" th:text="'Boletim de ' + ${boletim.nome()}">Boletim</h1>
+                <p class="text-muted mb-0">Notas por disciplina</p>
+            </div>
+            <div class="text-right">
+                <small class="text-muted d-block">Média geral</small>
+                <strong class="h4"
+                        th:text="${#numbers.formatDecimal(boletim.media(), 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+            </div>
+        </div>
 
         <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
 
-        <div class="alert alert-info" th:if="${#lists.isEmpty(boletim.notas())}">Nenhuma nota lançada.</div>
+        <div class="alert alert-info" th:if="${#lists.isEmpty(boletim.notas())}">
+            Este aluno ainda não possui notas lançadas.
+        </div>
 
         <table class="table table-striped" th:unless="${#lists.isEmpty(boletim.notas())}">
             <thead class="thead-dark">
-            <tr><th>Disciplina</th><th>Nota</th></tr>
+            <tr><th>Disciplina</th><th class="text-center" style="width: 120px;">Nota</th><th class="text-right" style="width: 220px;">Ações</th></tr>
             </thead>
             <tbody>
             <tr th:each="n : ${boletim.notas()}">
                 <td th:text="${n.disciplina()}">Disciplina</td>
-                <td th:text="${n.valor() != null} ? ${#numbers.formatDecimal(n.valor(), 1, 'POINT', 2, 'COMMA')} : '-'">-</td>
+                <td class="text-center">
+                    <strong th:text="${#numbers.formatDecimal(n.valor(), 1, 'POINT', 2, 'COMMA')}">0,00</strong>
+                </td>
+                <td class="text-right">
+                    <a class="btn btn-sm btn-outline-secondary mr-1"
+                       th:href="@{/web/alunos/{id}/boletim(id=${boletim.alunoId()},disciplina=${n.disciplinaId()})}">
+                        Editar
+                    </a>
+                    <form th:action="@{/web/alunos/{id}/notas/{disciplinaId}/remover(id=${boletim.alunoId()},disciplinaId=${n.disciplinaId()})}"
+                          method="post" class="d-inline"
+                          onsubmit="return confirm('Excluir esta nota?');">
+                        <button class="btn btn-sm btn-danger" type="submit">Excluir nota</button>
+                    </form>
+                </td>
             </tr>
             </tbody>
         </table>
 
-        <h5 class="mt-4">Lançar ou alterar nota</h5>
-        <form th:action="@{/web/alunos/{id}/notas(id=${boletim.alunoId()})}" th:object="${form}" method="post" class="form-inline">
-            <select class="form-control mr-2 mb-2" th:field="*{disciplinaId}">
-                <option value="">Disciplina...</option>
-                <option th:each="d : ${disciplinas}" th:value="${d.id()}" th:text="${d.nome()}"></option>
-            </select>
-            <input class="form-control mr-2 mb-2" type="number" step="0.01" min="0" max="10" th:field="*{valor}" placeholder="Nota (0 a 10)">
-            <button class="btn btn-primary mb-2" type="submit">Salvar nota</button>
-        </form>
-        <small class="text-danger d-block" th:if="${#fields.hasErrors('disciplinaId')}" th:errors="*{disciplinaId}"></small>
-        <small class="text-danger d-block" th:if="${#fields.hasErrors('valor')}" th:errors="*{valor}"></small>
+        <div class="mt-4 pt-3 border-top">
+            <h5 th:text="${disciplinaEdicao != null} ? 'Editar nota' : 'Lançar nota'">Lançar nota</h5>
+            <form th:action="@{/web/alunos/{id}/notas(id=${boletim.alunoId()})}" th:object="${form}" method="post">
+                <div class="form-row">
+                    <div class="col-md-6 mb-2">
+                        <label for="disciplinaId">Disciplina</label>
+                        <select id="disciplinaId" class="form-control" th:field="*{disciplinaId}"
+                                th:disabled="${disciplinaEdicao != null}">
+                            <option value="">Selecione uma disciplina</option>
+                            <option th:each="d : ${disciplinas}" th:value="${d.id()}" th:text="${d.nome()}"></option>
+                        </select>
+                        <input th:if="${disciplinaEdicao != null}" type="hidden" th:field="*{disciplinaId}">
+                        <small class="text-danger" th:if="${#fields.hasErrors('disciplinaId')}" th:errors="*{disciplinaId}"></small>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <label for="valor">Nota</label>
+                        <input id="valor" class="form-control" type="number" step="0.01" min="0" max="10"
+                               th:field="*{valor}" placeholder="0 a 10">
+                        <small class="text-danger" th:if="${#fields.hasErrors('valor')}" th:errors="*{valor}"></small>
+                    </div>
+                    <div class="col-md-3 mb-2 d-flex align-items-end">
+                        <button class="btn btn-primary btn-block" type="submit"
+                                th:text="${disciplinaEdicao != null} ? 'Salvar alteração' : 'Salvar nota'">Salvar nota</button>
+                    </div>
+                </div>
+                <a th:if="${disciplinaEdicao != null}" class="btn btn-outline-secondary btn-sm"
+                   th:href="@{/web/alunos/{id}/boletim(id=${boletim.alunoId()})}">Cancelar edição</a>
+            </form>
+        </div>
 
         <a class="btn btn-secondary mt-3" th:href="@{/web/alunos}">Voltar</a>
     </div>

@@ -5,4 +5,8 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 
-public record NotaRequest(@NotNull @DecimalMin("0") @DecimalMax("10") BigDecimal valor) {}
+public record NotaRequest(
+        @NotNull(message = "Informe a nota")
+        @DecimalMin(value = "0", message = "A nota não pode ser menor que 0")
+        @DecimalMax(value = "10", message = "A nota não pode ser maior que 10")
+        BigDecimal valor) {}

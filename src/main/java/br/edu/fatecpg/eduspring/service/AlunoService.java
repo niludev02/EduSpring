@@ -12,6 +12,7 @@ import br.edu.fatecpg.eduspring.model.Turma;
 import br.edu.fatecpg.eduspring.repository.AlunoRepository;
 import br.edu.fatecpg.eduspring.repository.DisciplinaRepository;
 import br.edu.fatecpg.eduspring.repository.TurmaRepository;
+import br.edu.fatecpg.eduspring.util.TextoUtils;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -28,8 +29,18 @@ public class AlunoService {
     @Transactional(readOnly = true)
     public List<AlunoResponse> listar(String nome, String turma, String ordem) {
         List<Aluno> lista;
-        if (nome != null && !nome.isBlank()) lista = alunos.findByNomeContainingIgnoreCase(nome);
-        else if (turma != null && !turma.isBlank()) lista = alunos.findByTurmaIdentificador(turma);
+        if (nome != null && !nome.isBlank()) {
+            String nomeNormalizado = TextoUtils.normalizar(nome);
+            lista = alunos.findAll().stream()
+                    .filter(a -> TextoUtils.normalizar(a.getNome()).contains(nomeNormalizado))
+                    .toList();
+        }
+        else if (turma != null && !turma.isBlank()) {
+            lista = alunos.findAll().stream()
+                    .filter(a -> a.getTurma() != null
+                            && TextoUtils.equivalentes(a.getTurma().getIdentificador(), turma))
+                    .toList();
+        }
         else if ("idade".equals(ordem)) lista = alunos.listarOrdenadosPorIdade();
         else if ("media".equals(ordem)) lista = alunos.listarOrdenadosPorMedia();
         else lista = alunos.findAll();
@@ -43,17 +54,21 @@ public class AlunoService {
 
     @Transactional(readOnly = true)
     public AlunoResponse buscarPorMatricula(String matricula) {
-        return AlunoResponse.de(alunos.findByMatricula(matricula)
-                .orElseThrow(() -> NegocioException.naoEncontrado("Aluno não encontrado")));
+        return AlunoResponse.de(alunos.findAll().stream()
+                .filter(a -> TextoUtils.equivalentes(a.getMatricula(), matricula))
+                .findFirst()
+                .orElseThrow(() -> NegocioException.naoEncontrado("Nenhum aluno foi encontrado com esta matrícula.")));
     }
 
     @Transactional
     public AlunoResponse criar(AlunoRequest r) {
-        if (alunos.findByMatricula(r.matricula()).isPresent())
-            throw NegocioException.conflito("Matrícula já cadastrada");
+        String matricula = TextoUtils.limpar(r.matricula());
+        if (alunos.findAll().stream()
+                .anyMatch(a -> TextoUtils.equivalentes(a.getMatricula(), matricula)))
+            throw NegocioException.conflito("Esta matrícula já está cadastrada.");
         Aluno a = new Aluno();
-        a.setMatricula(r.matricula());
-        a.setNome(r.nome());
+        a.setMatricula(matricula);
+        a.setNome(TextoUtils.limpar(r.nome()));
         a.setIdade(r.idade());
         definirTurma(a, r.turmaId());
         return AlunoResponse.de(alunos.save(a));
@@ -62,11 +77,13 @@ public class AlunoService {
     @Transactional
     public AlunoResponse atualizar(Long id, AlunoRequest r) {
         Aluno a = buscar(id);
-        alunos.findByMatricula(r.matricula())
-                .filter(outro -> !outro.getId().equals(id))
-                .ifPresent(x -> { throw NegocioException.conflito("Matrícula já cadastrada"); });
-        a.setMatricula(r.matricula());
-        a.setNome(r.nome());
+        String matricula = TextoUtils.limpar(r.matricula());
+        boolean duplicada = alunos.findAll().stream()
+                .anyMatch(outro -> !outro.getId().equals(id)
+                        && TextoUtils.equivalentes(outro.getMatricula(), matricula));
+        if (duplicada) throw NegocioException.conflito("Já existe outro aluno com esta matrícula.");
+        a.setMatricula(matricula);
+        a.setNome(TextoUtils.limpar(r.nome()));
         a.setIdade(r.idade());
         definirTurma(a, r.turmaId());
         return AlunoResponse.de(a);
@@ -92,7 +109,7 @@ public class AlunoService {
     public BoletimItem lancarNota(Long alunoId, Long disciplinaId, BigDecimal valor) {
         Aluno a = buscar(alunoId);
         Disciplina d = disciplinas.findById(disciplinaId)
-                .orElseThrow(() -> NegocioException.naoEncontrado("Disciplina não encontrada"));
+                .orElseThrow(() -> NegocioException.naoEncontrado("Disciplina não encontrada."));
         Nota nota = a.getNotas().stream()
                 .filter(n -> n.getDisciplina().getId().equals(disciplinaId))
                 .findFirst()
@@ -102,15 +119,23 @@ public class AlunoService {
         return new BoletimItem(d.getId(), d.getNome(), nota.getValor());
     }
 
+    @Transactional
+    public void removerNota(Long alunoId, Long disciplinaId) {
+        Aluno aluno = buscar(alunoId);
+        Disciplina disciplina = disciplinas.findById(disciplinaId)
+                .orElseThrow(() -> NegocioException.naoEncontrado("Disciplina não encontrada."));
+        aluno.removerDisciplina(disciplina);
+    }
+
     private Aluno buscar(Long id) {
-        return alunos.findById(id).orElseThrow(() -> NegocioException.naoEncontrado("Aluno não encontrado"));
+        return alunos.findById(id).orElseThrow(() -> NegocioException.naoEncontrado("Aluno não encontrado."));
     }
 
     private void definirTurma(Aluno a, Long turmaId) {
         if (a.getTurma() != null) a.getTurma().removerAluno(a);
         if (turmaId == null) return;
         Turma t = turmas.findById(turmaId)
-                .orElseThrow(() -> NegocioException.naoEncontrado("Turma não encontrada"));
+                .orElseThrow(() -> NegocioException.naoEncontrado("Turma não encontrada."));
         t.adicionarAluno(a);
     }
 }

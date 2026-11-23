@@ -41,6 +41,30 @@ a:hover { color: var(--floresta); }
 .navbar .nav-link { color: #dfe9d6 !important; font-weight: 600; }
 .navbar .nav-link:hover { color: var(--sol) !important; }
 
+@media (max-width: 768px) {
+    .navbar {
+        flex-wrap: wrap;
+        padding: .75rem 1rem;
+    }
+    .navbar-brand {
+        font-size: 1.15rem;
+    }
+    .navbar-brand img {
+        height: 32px;
+    }
+    .navbar-nav {
+        width: 100%;
+        margin-top: .25rem;
+        flex-wrap: wrap;
+    }
+    .navbar-nav .nav-link {
+        padding: .45rem .65rem;
+    }
+    .box {
+        padding: 1.25rem;
+    }
+}
+
 .box {
     background: #fff;
     border: 1px solid #e3ead8;
@@ -71,6 +95,42 @@ a:hover { color: var(--floresta); }
     font-weight: 500;
 }
 .table-striped tbody tr:nth-of-type(odd) { background: rgba(109, 179, 63, .08); }
+
+.form-cadastro {
+    background: rgba(109, 179, 63, .06);
+    border: 1px solid #dde8d2;
+    border-radius: 10px;
+    padding: 1rem;
+}
+.form-cadastro.form-inline {
+    align-items: flex-start;
+}
+.table td, .table th {
+    vertical-align: middle;
+}
+.table-actions {
+    min-width: 190px;
+}
+.turmas-opcoes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: .5rem;
+    background: #f8faf5;
+}
+.turmas-opcoes .form-check {
+    padding: .65rem .75rem .65rem 2.25rem;
+    border: 1px solid #dde8d2;
+    border-radius: 8px;
+    background: #fff;
+}
+.badge-turma {
+    display: inline-block;
+    margin: 2px 3px 2px 0;
+    padding: .45rem .65rem;
+    background: #eaf5df;
+    color: var(--floresta);
+    border: 1px solid #cfe6b8;
+}
 
 .alert-info { background: #eaf5df; border-color: #cfe6b8; color: #2f5a1a; }
 

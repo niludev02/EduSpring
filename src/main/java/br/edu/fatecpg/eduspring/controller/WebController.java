@@ -6,11 +6,14 @@ import br.edu.fatecpg.eduspring.dto.AlunoResponse;
 import br.edu.fatecpg.eduspring.dto.DisciplinaForm;
 import br.edu.fatecpg.eduspring.dto.DisciplinaRequest;
 import br.edu.fatecpg.eduspring.dto.NotaForm;
+import br.edu.fatecpg.eduspring.dto.ProfessorForm;
+import br.edu.fatecpg.eduspring.dto.ProfessorRequest;
 import br.edu.fatecpg.eduspring.dto.TurmaForm;
 import br.edu.fatecpg.eduspring.dto.TurmaRequest;
 import br.edu.fatecpg.eduspring.exception.NegocioException;
 import br.edu.fatecpg.eduspring.service.AlunoService;
 import br.edu.fatecpg.eduspring.service.DisciplinaService;
+import br.edu.fatecpg.eduspring.service.ProfessorService;
 import br.edu.fatecpg.eduspring.service.TurmaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +28,23 @@ public class WebController {
     private final TurmaService turmas;
     private final DisciplinaService disciplinas;
     private final AlunoService alunos;
+    private final ProfessorService professores;
 
     @GetMapping("/")
     public String raiz() { return "inicio"; }
 
     @GetMapping("/web/turmas")
-    public String turmas(Model m) {
+    public String turmas(@RequestParam(required = false) Long editar, Model m) {
         m.addAttribute("turmas", turmas.listar());
-        m.addAttribute("form", new TurmaForm());
+        TurmaForm form = new TurmaForm();
+        if (editar != null) {
+            var turma = turmas.buscarPorId(editar);
+            form.setIdentificador(turma.identificador());
+            form.setProfessorId(turma.professorId());
+        }
+        m.addAttribute("form", form);
+        m.addAttribute("editarId", editar);
+        m.addAttribute("professoresDisponiveis", turmas.professoresDisponiveis(editar));
         return "turmas";
     }
 
@@ -40,20 +52,60 @@ public class WebController {
     public String criarTurma(@Valid @ModelAttribute("form") TurmaForm form, BindingResult result, Model m) {
         if (!result.hasErrors()) {
             try {
-                turmas.criar(new TurmaRequest(form.getIdentificador()));
+                turmas.criar(new TurmaRequest(form.getIdentificador(), form.getProfessorId()));
                 return "redirect:/web/turmas";
             } catch (NegocioException e) {
                 m.addAttribute("erro", e.getMessage());
             }
         }
         m.addAttribute("turmas", turmas.listar());
+        m.addAttribute("editarId", null);
+        m.addAttribute("professoresDisponiveis", turmas.professoresDisponiveis(null));
         return "turmas";
     }
 
+    @PostMapping("/web/turmas/{id}/editar")
+    public String salvarEdicaoTurma(@PathVariable Long id, @Valid @ModelAttribute("form") TurmaForm form,
+                                    BindingResult result, Model m) {
+        if (!result.hasErrors()) {
+            try {
+                turmas.atualizar(id, new TurmaRequest(form.getIdentificador(), form.getProfessorId()));
+                return "redirect:/web/turmas";
+            } catch (NegocioException e) {
+                m.addAttribute("erro", e.getMessage());
+            }
+        }
+        m.addAttribute("turmas", turmas.listar());
+        m.addAttribute("editarId", id);
+        m.addAttribute("professoresDisponiveis", turmas.professoresDisponiveis(id));
+        return "turmas";
+    }
+
+    @PostMapping("/web/turmas/{id}/remover")
+    public String removerTurma(@PathVariable Long id, Model m) {
+        try {
+            turmas.remover(id);
+            return "redirect:/web/turmas";
+        } catch (NegocioException e) {
+            m.addAttribute("erro", e.getMessage());
+            m.addAttribute("turmas", turmas.listar());
+            m.addAttribute("form", new TurmaForm());
+            m.addAttribute("editarId", null);
+            m.addAttribute("professoresDisponiveis", turmas.professoresDisponiveis(null));
+            return "turmas";
+        }
+    }
+
     @GetMapping("/web/disciplinas")
-    public String disciplinas(Model m) {
+    public String disciplinas(@RequestParam(required = false) Long editar, Model m) {
         m.addAttribute("disciplinas", disciplinas.listar());
-        m.addAttribute("form", new DisciplinaForm());
+        DisciplinaForm form = new DisciplinaForm();
+        if (editar != null) {
+            var disciplina = disciplinas.buscarPorId(editar);
+            form.setNome(disciplina.nome());
+        }
+        m.addAttribute("form", form);
+        m.addAttribute("editarId", editar);
         return "disciplinas";
     }
 
@@ -68,7 +120,38 @@ public class WebController {
             }
         }
         m.addAttribute("disciplinas", disciplinas.listar());
+        m.addAttribute("editarId", null);
         return "disciplinas";
+    }
+
+    @PostMapping("/web/disciplinas/{id}/editar")
+    public String salvarEdicaoDisciplina(@PathVariable Long id, @Valid @ModelAttribute("form") DisciplinaForm form,
+                                         BindingResult result, Model m) {
+        if (!result.hasErrors()) {
+            try {
+                disciplinas.atualizar(id, new DisciplinaRequest(form.getNome()));
+                return "redirect:/web/disciplinas";
+            } catch (NegocioException e) {
+                m.addAttribute("erro", e.getMessage());
+            }
+        }
+        m.addAttribute("disciplinas", disciplinas.listar());
+        m.addAttribute("editarId", id);
+        return "disciplinas";
+    }
+
+    @PostMapping("/web/disciplinas/{id}/remover")
+    public String removerDisciplina(@PathVariable Long id, Model m) {
+        try {
+            disciplinas.remover(id);
+            return "redirect:/web/disciplinas";
+        } catch (NegocioException e) {
+            m.addAttribute("erro", e.getMessage());
+            m.addAttribute("disciplinas", disciplinas.listar());
+            m.addAttribute("form", new DisciplinaForm());
+            m.addAttribute("editarId", null);
+            return "disciplinas";
+        }
     }
 
     @GetMapping("/web/alunos")
@@ -119,10 +202,21 @@ public class WebController {
     }
 
     @GetMapping("/web/alunos/{id}/boletim")
-    public String boletim(@PathVariable Long id, Model m) {
+    public String boletim(@PathVariable Long id,
+                          @RequestParam(required = false) Long disciplina,
+                          Model m) {
         m.addAttribute("boletim", alunos.boletim(id));
         m.addAttribute("disciplinas", disciplinas.listar());
-        m.addAttribute("form", new NotaForm());
+        NotaForm form = new NotaForm();
+        if (disciplina != null) {
+            form.setDisciplinaId(disciplina);
+            alunos.boletim(id).notas().stream()
+                    .filter(n -> n.disciplinaId().equals(disciplina))
+                    .findFirst()
+                    .ifPresent(n -> form.setValor(n.valor()));
+        }
+        m.addAttribute("form", form);
+        m.addAttribute("disciplinaEdicao", disciplina);
         return "boletim";
     }
 
@@ -139,7 +233,70 @@ public class WebController {
         }
         m.addAttribute("boletim", alunos.boletim(id));
         m.addAttribute("disciplinas", disciplinas.listar());
+        m.addAttribute("disciplinaEdicao", form.getDisciplinaId());
         return "boletim";
+    }
+
+    @PostMapping("/web/alunos/{id}/notas/{disciplinaId}/remover")
+    public String removerNota(@PathVariable Long id, @PathVariable Long disciplinaId) {
+        alunos.removerNota(id, disciplinaId);
+        return "redirect:/web/alunos/" + id + "/boletim";
+    }
+
+    @GetMapping("/web/professores")
+    public String professores(@RequestParam(required = false) Long editar, Model m) {
+        ProfessorForm form = new ProfessorForm();
+        if (editar != null) {
+            var professor = professores.buscarPorId(editar);
+            form.setNome(professor.nome());
+            form.setDisciplinaId(professor.disciplinaId());
+            form.setTurmaIds(professor.turmaIds());
+        }
+        m.addAttribute("form", form);
+        m.addAttribute("editarId", editar);
+        m.addAttribute("professores", professores.listar());
+        m.addAttribute("disciplinasDisponiveis", professores.disciplinasDisponiveis(editar));
+        m.addAttribute("turmasDisponiveis", professores.turmasDisponiveis(editar));
+        return "professores";
+    }
+
+    @PostMapping("/web/professores")
+    public String criarProfessor(@Valid @ModelAttribute("form") ProfessorForm form,
+                                 BindingResult result, Model m) {
+        if (!result.hasErrors()) {
+            try {
+                professores.criar(new ProfessorRequest(
+                        form.getNome(), form.getDisciplinaId(), form.getTurmaIds()));
+                return "redirect:/web/professores";
+            } catch (NegocioException e) {
+                m.addAttribute("erro", e.getMessage());
+            }
+        }
+        preencherProfessorForm(form, null, m);
+        return "professores";
+    }
+
+    @PostMapping("/web/professores/{id}/editar")
+    public String salvarEdicaoProfessor(@PathVariable Long id,
+                                        @Valid @ModelAttribute("form") ProfessorForm form,
+                                        BindingResult result, Model m) {
+        if (!result.hasErrors()) {
+            try {
+                professores.atualizar(id, new ProfessorRequest(
+                        form.getNome(), form.getDisciplinaId(), form.getTurmaIds()));
+                return "redirect:/web/professores";
+            } catch (NegocioException e) {
+                m.addAttribute("erro", e.getMessage());
+            }
+        }
+        preencherProfessorForm(form, id, m);
+        return "professores";
+    }
+
+    @PostMapping("/web/professores/{id}/remover")
+    public String removerProfessor(@PathVariable Long id) {
+        professores.remover(id);
+        return "redirect:/web/professores";
     }
 
     @GetMapping("/web/resumo")
@@ -169,5 +326,13 @@ public class WebController {
         m.addAttribute("titulo", id == null ? "Novo aluno" : "Editar aluno");
         m.addAttribute("acao", id == null ? "/web/alunos/novo" : "/web/alunos/" + id + "/editar");
         return "aluno-form";
+    }
+
+    private void preencherProfessorForm(ProfessorForm form, Long editarId, Model m) {
+        m.addAttribute("form", form);
+        m.addAttribute("editarId", editarId);
+        m.addAttribute("professores", professores.listar());
+        m.addAttribute("disciplinasDisponiveis", professores.disciplinasDisponiveis(editarId));
+        m.addAttribute("turmasDisponiveis", professores.turmasDisponiveis(editarId));
     }
 }

@@ -25,6 +25,20 @@ public class TurmaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.criar(r));
     }
 
+    @GetMapping("/{id}")
+    public TurmaResponse buscar(@PathVariable Long id) { return service.buscarPorId(id); }
+
+    @PutMapping("/{id}")
+    public TurmaResponse atualizar(@PathVariable Long id, @Valid @RequestBody TurmaRequest r) {
+        return service.atualizar(id, r);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> remover(@PathVariable Long id) {
+        service.remover(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}/media")
     public BigDecimal media(@PathVariable Long id) { return service.media(id); }
 

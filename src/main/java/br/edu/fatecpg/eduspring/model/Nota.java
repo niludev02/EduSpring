@@ -30,7 +30,7 @@ public class Nota {
 
     public void atribuirNota(BigDecimal novaNota) {
         if (novaNota == null || novaNota.compareTo(BigDecimal.ZERO) < 0 || novaNota.compareTo(BigDecimal.TEN) > 0)
-            throw NegocioException.invalido("A nota deve estar entre 0 e 10");
+            throw NegocioException.invalido("Informe uma nota entre 0 e 10.");
         this.valor = novaNota;
     }
 }
