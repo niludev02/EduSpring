@@ -12,17 +12,22 @@
         <form th:action="@{${acao}}" th:object="${form}" method="post">
             <div class="form-group">
                 <label>Matrícula</label>
-                <input class="form-control" type="text" th:field="*{matricula}">
+                <input class="form-control" type="text" th:field="*{matricula}"
+                       data-mask="matricula" maxlength="30" autocomplete="off"
+                       placeholder="Ex.: 2026001 ou 2026-001">
                 <small class="text-danger" th:if="${#fields.hasErrors('matricula')}" th:errors="*{matricula}"></small>
             </div>
             <div class="form-group">
                 <label>Nome</label>
-                <input class="form-control" type="text" th:field="*{nome}">
+                <input class="form-control" type="text" th:field="*{nome}"
+                       data-mask="nome" data-maxlength="150" maxlength="150" autocomplete="name"
+                       placeholder="Ex.: Ana Maria Souza">
                 <small class="text-danger" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
             </div>
             <div class="form-group">
                 <label>Idade</label>
-                <input class="form-control" type="number" th:field="*{idade}">
+                <input class="form-control" type="number" th:field="*{idade}"
+                       data-mask="idade" min="12" max="120" placeholder="Ex.: 18">
                 <small class="text-danger" th:if="${#fields.hasErrors('idade')}" th:errors="*{idade}"></small>
             </div>
             <div class="form-group">

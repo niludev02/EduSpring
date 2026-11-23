@@ -15,7 +15,8 @@
                 <div class="col-md-5 mb-3">
                     <label for="nome">Nome do professor</label>
                     <input id="nome" class="form-control" type="text" th:field="*{nome}"
-                           placeholder="Nome completo">
+                           data-mask="nome" data-maxlength="150" maxlength="150" autocomplete="name"
+                           placeholder="Ex.: Carlos Silva">
                     <small class="text-danger" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
                 </div>
                 <div class="col-md-7 mb-3">
@@ -92,16 +93,5 @@
     </div>
 </div>
 <footer th:replace="~{fragments :: footer}"></footer>
-<script>
-    document.querySelectorAll('.turma-checkbox').forEach(function (checkbox) {
-        checkbox.addEventListener('change', function () {
-            var selecionadas = document.querySelectorAll('.turma-checkbox:checked');
-            if (selecionadas.length > 2) {
-                this.checked = false;
-                alert('Um professor pode ser responsável por no máximo 2 turmas.');
-            }
-        });
-    });
-</script>
 </body>
 </html>

@@ -62,6 +62,7 @@ public class AlunoService {
 
     @Transactional
     public AlunoResponse criar(AlunoRequest r) {
+        validarIdade(r.idade());
         String matricula = TextoUtils.limpar(r.matricula());
         if (alunos.findAll().stream()
                 .anyMatch(a -> TextoUtils.equivalentes(a.getMatricula(), matricula)))
@@ -76,6 +77,7 @@ public class AlunoService {
 
     @Transactional
     public AlunoResponse atualizar(Long id, AlunoRequest r) {
+        validarIdade(r.idade());
         Aluno a = buscar(id);
         String matricula = TextoUtils.limpar(r.matricula());
         boolean duplicada = alunos.findAll().stream()
@@ -129,6 +131,13 @@ public class AlunoService {
 
     private Aluno buscar(Long id) {
         return alunos.findById(id).orElseThrow(() -> NegocioException.naoEncontrado("Aluno não encontrado."));
+    }
+
+    private void validarIdade(Integer idade) {
+        if (idade == null || idade < 12)
+            throw NegocioException.invalido("A idade mínima para cadastrar um aluno é 12 anos.");
+        if (idade > 120)
+            throw NegocioException.invalido("A idade máxima permitida é 120 anos.");
     }
 
     private void definirTurma(Aluno a, Long turmaId) {

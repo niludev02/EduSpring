@@ -8,7 +8,9 @@
         <h1 class="mb-4">Alunos</h1>
 
         <form th:action="@{/web/alunos}" method="get" class="form-inline mb-3">
-            <input class="form-control mr-2 mb-2" type="text" name="nome" th:value="${nome}" placeholder="Buscar por nome">
+            <input class="form-control mr-2 mb-2" type="text" name="nome" th:value="${nome}"
+                   data-mask="nome" data-maxlength="150" maxlength="150"
+                   placeholder="Ex.: Ana Souza">
             <select class="form-control mr-2 mb-2" name="turma">
                 <option value="">Todas as turmas</option>
                 <option th:each="t : ${turmas}" th:value="${t.identificador()}" th:text="${t.identificador()}"

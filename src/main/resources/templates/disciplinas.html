@@ -12,7 +12,9 @@
         <form th:action="${editarId != null} ? @{/web/disciplinas/{id}/editar(id=${editarId})} : @{/web/disciplinas}"
               th:object="${form}" method="post" class="form-cadastro form-inline mb-4">
             <label class="sr-only" for="nomeDisciplina">Nome da disciplina</label>
-            <input id="nomeDisciplina" class="form-control mr-2 mb-2" type="text" th:field="*{nome}" placeholder="Nome da disciplina">
+            <input id="nomeDisciplina" class="form-control mr-2 mb-2" type="text" th:field="*{nome}"
+                   data-mask="texto" data-maxlength="100" maxlength="100"
+                   placeholder="Ex.: Banco de Dados">
             <button class="btn btn-primary mb-2" type="submit"
                     th:text="${editarId != null} ? 'Salvar alterações' : 'Cadastrar disciplina'">Cadastrar disciplina</button>
             <a th:if="${editarId != null}" class="btn btn-outline-secondary ml-2" th:href="@{/web/disciplinas}">Cancelar</a>

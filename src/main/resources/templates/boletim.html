@@ -64,8 +64,9 @@
                     </div>
                     <div class="col-md-3 mb-2">
                         <label for="valor">Nota</label>
-                        <input id="valor" class="form-control" type="number" step="0.01" min="0" max="10"
-                               th:field="*{valor}" placeholder="0 a 10">
+                        <input id="valor" class="form-control" type="text" inputmode="decimal"
+                               th:field="*{valor}" data-mask="nota" maxlength="5"
+                               autocomplete="off" placeholder="Ex.: 8.50">
                         <small class="text-danger" th:if="${#fields.hasErrors('valor')}" th:errors="*{valor}"></small>
                     </div>
                     <div class="col-md-3 mb-2 d-flex align-items-end">

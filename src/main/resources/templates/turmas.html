@@ -12,7 +12,9 @@
         <form th:action="${editarId != null} ? @{/web/turmas/{id}/editar(id=${editarId})} : @{/web/turmas}"
               th:object="${form}" method="post" class="form-cadastro form-inline mb-4">
             <label class="sr-only" for="identificadorTurma">Identificador da turma</label>
-            <input id="identificadorTurma" class="form-control mr-2 mb-2" type="text" th:field="*{identificador}" placeholder="Identificador (ex: DSM-3)">
+            <input id="identificadorTurma" class="form-control mr-2 mb-2" type="text" th:field="*{identificador}"
+                   data-mask="turma" maxlength="50" autocomplete="off"
+                   placeholder="Ex.: DSM-3">
             <label class="sr-only" for="professorTurma">Professor responsável</label>
             <select id="professorTurma" class="form-control mr-2 mb-2" th:field="*{professorId}">
                 <option value="">Sem professor responsável</option>
