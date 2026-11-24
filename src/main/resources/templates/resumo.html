@@ -7,7 +7,7 @@
     <div class="alert alert-danger d-none" id="erro"></div>
     <div class="row">
         <div class="col-md-6 mb-4">
-            <div class="box shadow-sm">
+            <div class="card brand-card shadow-sm">
                 <h4>Turmas</h4>
                 <table class="table table-sm">
                     <thead><tr><th>Turma</th><th>Alunos (query nativa)</th><th>Média</th></tr></thead>
@@ -16,7 +16,7 @@
             </div>
         </div>
         <div class="col-md-6 mb-4">
-            <div class="box shadow-sm">
+            <div class="card brand-card shadow-sm">
                 <h4>Ranking de alunos por média</h4>
                 <table class="table table-sm">
                     <thead><tr><th>#</th><th>Aluno</th><th>Turma</th><th>Média</th></tr></thead>
@@ -25,6 +25,49 @@
             </div>
         </div>
     </div>
+
+    <section class="card brand-card shadow-sm mb-4 d-none" id="aluno-destaque"
+             aria-labelledby="titulo-destaque">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 id="titulo-destaque" class="mb-0">Aluno destaque</h4>
+            <button class="btn btn-outline-primary btn-sm no-print" id="imprimir-diploma" type="button">
+                Imprimir diploma
+            </button>
+        </div>
+        <div class="diploma-stage">
+            <div class="diploma-paper" id="diploma-paper">
+                <div class="diploma-inner">
+                    <span class="diploma-corner top-left" aria-hidden="true"></span>
+                    <span class="diploma-corner top-right" aria-hidden="true"></span>
+                    <span class="diploma-corner bottom-left" aria-hidden="true"></span>
+                    <span class="diploma-corner bottom-right" aria-hidden="true"></span>
+                    <p class="diploma-brand">EduSpring · Escola de Spring</p>
+                    <h2 class="diploma-title">Diploma de Excelência</h2>
+                    <p class="diploma-subtitle">Melhor aluno da escola</p>
+                    <div class="diploma-divider" aria-hidden="true"></div>
+                    <p class="diploma-intro">Conferido a</p>
+                    <p class="diploma-name" id="diploma-nome"></p>
+                    <p class="diploma-meta" id="diploma-turma"></p>
+                    <p class="diploma-description">
+                        pelo desempenho acadêmico excepcional, com média final de
+                        <strong id="diploma-media"></strong>.
+                    </p>
+                    <div class="diploma-footer">
+                        <div class="diploma-signature">
+                            <span>Coordenação pedagógica</span>
+                        </div>
+                        <div class="diploma-seal" aria-label="Selo de excelência">
+                            <span aria-hidden="true">🌱</span>
+                            <strong id="diploma-selo"></strong>
+                        </div>
+                        <div class="diploma-signature">
+                            <span id="diploma-data"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
 <script>
@@ -38,6 +81,17 @@
             tr.appendChild(td);
         });
         return tr;
+    }
+
+    function preencherDiploma(aluno) {
+        document.getElementById('diploma-nome').textContent = aluno.nome;
+        document.getElementById('diploma-turma').textContent =
+            (aluno.turma || 'Sem turma') + ' · 1º lugar no ranking';
+        document.getElementById('diploma-media').textContent = fmt(aluno.media);
+        document.getElementById('diploma-selo').textContent = fmt(aluno.media);
+        document.getElementById('diploma-data').textContent =
+            'Direção · ' + new Intl.DateTimeFormat('pt-BR').format(new Date());
+        document.getElementById('aluno-destaque').classList.remove('d-none');
     }
 
     async function api(url) {
@@ -61,7 +115,19 @@
             const ranking = await api('/alunos?ordem=media');
             const corpoRanking = document.getElementById('ranking');
             ranking.forEach(function (a, i) {
-                corpoRanking.appendChild(linha([i + 1, a.nome, a.turma || '-', fmt(a.media)]));
+                const tr = linha([i + 1, '', a.turma || '-', fmt(a.media)]);
+                const nome = document.createElement('span');
+                nome.textContent = a.nome;
+                tr.cells[1].appendChild(nome);
+                if (i === 0) {
+                    const link = document.createElement('a');
+                    link.className = 'diploma-link ml-1';
+                    link.href = '#aluno-destaque';
+                    link.textContent = 'Diploma';
+                    tr.cells[1].appendChild(link);
+                    preencherDiploma(a);
+                }
+                corpoRanking.appendChild(tr);
             });
         } catch (e) {
             const box = document.getElementById('erro');
@@ -69,6 +135,10 @@
             box.classList.remove('d-none');
         }
     }
+
+    document.getElementById('imprimir-diploma').addEventListener('click', function () {
+        window.print();
+    });
 
     carregar();
 </script>

@@ -13,12 +13,12 @@
     <title th:text="${titulo} + ' | EduSpring'">EduSpring</title>
 </head>
 <body>
-<nav th:fragment="navbar" class="navbar navbar-expand navbar-dark">
+<nav th:fragment="navbar" class="navbar navbar-expand navbar-dark flex-wrap px-3 py-3">
     <a class="navbar-brand" th:href="@{/}">
         <img th:src="@{/img/logo.svg}" alt="Logo EduSpring">
         <span>Edu<span class="spring">Spring</span></span>
     </a>
-    <ul class="navbar-nav mr-auto">
+    <ul class="navbar-nav mr-auto flex-wrap">
         <li class="nav-item"><a class="nav-link" th:href="@{/web/turmas}">Turmas</a></li>
         <li class="nav-item"><a class="nav-link" th:href="@{/web/alunos}">Alunos</a></li>
         <li class="nav-item"><a class="nav-link" th:href="@{/web/disciplinas}">Disciplinas</a></li>

@@ -5,7 +5,6 @@
     --floresta: #1F3D2B;
     --creme: #F6F8EF;
     --sol: #F4C542;
-    --flor: #F2A7B8;
     --texto: #24352B;
 }
 
@@ -16,8 +15,8 @@ body {
 }
 
 h1, h2, h3, h4, h5 {
-    font-family: 'Fredoka', 'Nunito', sans-serif;
     color: var(--floresta);
+    font-family: 'Fredoka', 'Nunito', sans-serif;
     font-weight: 600;
 }
 
@@ -29,49 +28,24 @@ a:hover { color: var(--floresta); }
     border-bottom: 4px solid var(--verde);
 }
 .navbar-brand {
-    display: flex;
     align-items: center;
-    font-family: 'Fredoka', sans-serif;
-    font-weight: 600;
-    font-size: 1.4rem;
     color: #fff !important;
+    display: flex;
+    font-family: 'Fredoka', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 600;
 }
 .navbar-brand img { height: 38px; margin-right: .6rem; }
 .navbar-brand .spring { color: var(--verde-claro); }
 .navbar .nav-link { color: #dfe9d6 !important; font-weight: 600; }
 .navbar .nav-link:hover { color: var(--sol) !important; }
 
-@media (max-width: 768px) {
-    .navbar {
-        flex-wrap: wrap;
-        padding: .75rem 1rem;
-    }
-    .navbar-brand {
-        font-size: 1.15rem;
-    }
-    .navbar-brand img {
-        height: 32px;
-    }
-    .navbar-nav {
-        width: 100%;
-        margin-top: .25rem;
-        flex-wrap: wrap;
-    }
-    .navbar-nav .nav-link {
-        padding: .45rem .65rem;
-    }
-    .box {
-        padding: 1.25rem;
-    }
-}
-
-.box {
+.brand-card {
     background: #fff;
     border: 1px solid #e3ead8;
     border-top: 5px solid var(--verde);
     border-radius: 14px;
     padding: 2rem;
-    box-shadow: 0 6px 18px rgba(31, 61, 43, .07);
 }
 
 .btn-primary { background: var(--verde-escuro); border-color: var(--verde-escuro); font-weight: 600; }
@@ -95,6 +69,8 @@ a:hover { color: var(--floresta); }
     font-weight: 500;
 }
 .table-striped tbody tr:nth-of-type(odd) { background: rgba(109, 179, 63, .08); }
+.table td, .table th { vertical-align: middle; }
+.table-actions { min-width: 190px; }
 
 .form-cadastro {
     background: rgba(109, 179, 63, .06);
@@ -102,34 +78,27 @@ a:hover { color: var(--floresta); }
     border-radius: 10px;
     padding: 1rem;
 }
-.form-cadastro.form-inline {
-    align-items: flex-start;
-}
-.table td, .table th {
-    vertical-align: middle;
-}
-.table-actions {
-    min-width: 190px;
-}
+.form-cadastro.form-inline { align-items: flex-start; }
+
 .turmas-opcoes {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: .5rem;
     background: #f8faf5;
+    display: grid;
+    gap: .5rem;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
 }
 .turmas-opcoes .form-check {
-    padding: .65rem .75rem .65rem 2.25rem;
+    background: #fff;
     border: 1px solid #dde8d2;
     border-radius: 8px;
-    background: #fff;
+    padding: .65rem .75rem .65rem 2.25rem;
 }
 .badge-turma {
+    background: #eaf5df;
+    border: 1px solid #cfe6b8;
+    color: var(--floresta);
     display: inline-block;
     margin: 2px 3px 2px 0;
     padding: .45rem .65rem;
-    background: #eaf5df;
-    color: var(--floresta);
-    border: 1px solid #cfe6b8;
 }
 
 .alert-info { background: #eaf5df; border-color: #cfe6b8; color: #2f5a1a; }
@@ -138,19 +107,19 @@ a:hover { color: var(--floresta); }
     background: linear-gradient(135deg, var(--floresta), #2f6b3a);
     border-radius: 18px;
     color: #fff;
+    overflow: hidden;
     padding: 3rem 2rem;
     position: relative;
-    overflow: hidden;
 }
 .hero::after {
+    background: rgba(155, 209, 106, .18);
+    border-radius: 50%;
     content: "";
+    height: 240px;
     position: absolute;
     right: -60px;
     top: -60px;
     width: 240px;
-    height: 240px;
-    border-radius: 50%;
-    background: rgba(155, 209, 106, .18);
 }
 .hero h1 { color: #fff; font-size: 2.6rem; }
 .hero h1 .spring { color: var(--verde-claro); }
@@ -158,34 +127,138 @@ a:hover { color: var(--floresta); }
 .hero img { height: 90px; margin-bottom: 1rem; }
 
 .atalho {
-    display: block;
     background: #fff;
     border: 1px solid #e3ead8;
     border-bottom: 5px solid var(--verde);
     border-radius: 14px;
+    color: var(--texto);
+    display: block;
+    height: 100%;
     padding: 1.5rem;
     text-align: center;
-    color: var(--texto);
     text-decoration: none;
-    height: 100%;
     transition: transform .15s, box-shadow .15s;
 }
 .atalho:hover {
-    transform: translateY(-4px);
     box-shadow: 0 10px 22px rgba(31, 61, 43, .12);
     color: var(--texto);
     text-decoration: none;
+    transform: translateY(-4px);
 }
 .atalho .emoji { font-size: 2rem; }
 .atalho h5 { margin: .5rem 0 .25rem; }
 .atalho:nth-child(2n) { border-bottom-color: var(--sol); }
 
 .site-footer {
+    border-top: 1px solid #dfe7d3;
+    color: #6b7d63;
+    font-size: .9rem;
     margin-top: 3rem;
     padding: 1.5rem 0;
     text-align: center;
-    color: #6b7d63;
-    font-size: .9rem;
-    border-top: 1px solid #dfe7d3;
 }
 .site-footer .spring { color: var(--verde-escuro); font-weight: 700; }
+
+.diploma-stage { background: #f6f6ef; border-radius: 12px; padding: 16px; }
+.diploma-link { color: var(--verde-escuro); font-weight: 700; }
+.diploma-link:hover { color: var(--floresta); }
+.diploma-paper { background: #fdfbf3; border: 6px solid #1f3d2b; padding: 8px; position: relative; }
+.diploma-inner {
+    border: 1.5px solid #c9a227;
+    color: var(--floresta);
+    font-family: Georgia, 'Times New Roman', serif;
+    padding: 26px 30px 22px;
+    position: relative;
+    text-align: center;
+}
+.diploma-corner {
+    border: 2px solid var(--verde);
+    height: 18px;
+    position: absolute;
+    width: 18px;
+}
+.diploma-corner.top-left { border-bottom: 0; border-right: 0; left: 6px; top: 6px; }
+.diploma-corner.top-right { border-bottom: 0; border-left: 0; right: 6px; top: 6px; }
+.diploma-corner.bottom-left { border-right: 0; border-top: 0; bottom: 6px; left: 6px; }
+.diploma-corner.bottom-right { border-left: 0; border-top: 0; bottom: 6px; right: 6px; }
+.diploma-brand {
+    color: #4a7c2f;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    margin: 0;
+    text-transform: uppercase;
+}
+.diploma-title { color: #1f3d2b; font-size: 30px; font-weight: 400; margin: 8px 0 2px; }
+.diploma-subtitle {
+    color: #a07d12;
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin: 0;
+    text-transform: uppercase;
+}
+.diploma-divider { background: #c9a227; height: 1.5px; margin: 14px auto; width: 90px; }
+.diploma-intro, .diploma-description { color: #3d4f42; font-style: italic; margin: 0; }
+.diploma-name { color: #1f3d2b; font-size: 34px; font-weight: 400; margin: 8px 0 2px; }
+.diploma-meta {
+    color: #4a5a4e;
+    font-family: 'Nunito', sans-serif;
+    font-size: 13px;
+    margin: 0 0 12px;
+}
+.diploma-description { font-size: 14px; line-height: 1.6; margin: 0 auto; max-width: 430px; }
+.diploma-description strong { border-bottom: 1.5px solid #c9a227; color: #1f3d2b; font-weight: 400; }
+.diploma-footer {
+    align-items: flex-end;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1.5rem;
+}
+.diploma-signature {
+    border-top: 1px solid var(--floresta);
+    color: #4a5a4e;
+    font-family: 'Nunito', sans-serif;
+    font-size: .7rem;
+    padding-top: .25rem;
+    width: 150px;
+}
+.diploma-seal {
+    align-items: center;
+    background: var(--floresta);
+    border: 3px solid #c9a227;
+    border-radius: 50%;
+    color: #f2d675;
+    display: flex;
+    flex-direction: column;
+    height: 76px;
+    justify-content: center;
+    outline: 2px solid var(--floresta);
+    outline-offset: 2px;
+    width: 76px;
+}
+.diploma-seal span { font-size: 1.3rem; line-height: 1; }
+.diploma-seal strong { font-family: 'Nunito', sans-serif; font-size: .7rem; }
+
+@media (max-width: 768px) {
+    .navbar-brand { font-size: 1.15rem; }
+    .navbar-brand img { height: 32px; }
+    .brand-card { padding: 1.25rem; }
+    .diploma-stage { padding: 10px; }
+    .diploma-inner { padding: 26px 14px 22px; }
+    .diploma-name { font-size: 28px; }
+    .diploma-footer { align-items: center; flex-wrap: wrap; gap: 1.25rem; justify-content: center; }
+}
+
+@media print {
+    @page { size: A4 landscape; margin: 1.5cm; }
+    body * { visibility: hidden !important; }
+    #diploma-paper, #diploma-paper * { visibility: visible !important; }
+    #diploma-paper {
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+    }
+    .diploma-stage, .diploma-paper { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

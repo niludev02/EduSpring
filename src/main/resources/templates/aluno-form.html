@@ -4,7 +4,7 @@
 <body>
 <nav th:replace="~{fragments :: navbar}"></nav>
 <div class="container mt-4" style="max-width: 600px;">
-    <div class="box shadow-sm">
+    <div class="card brand-card shadow-sm">
         <h1 class="mb-4" th:text="${titulo}">Novo aluno</h1>
 
         <div class="alert alert-danger" th:if="${erro}" th:text="${erro}"></div>
